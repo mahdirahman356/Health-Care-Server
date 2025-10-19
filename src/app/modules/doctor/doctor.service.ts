@@ -137,6 +137,28 @@ const getAISuggestions = async (payload: { symptoms: string }) => {
 
 }
 
+const getDoctorById = async (id: string): Promise<Doctor | null> => {
+    const result = await prisma.doctor.findUnique({
+        where: {
+            id,
+            isDeleted: false,
+        },
+        include: {
+            doctorSpecialties: {
+                include: {
+                    specialities: true,
+                },
+            },
+            doctorSchedules: {
+                include: {
+                    schedule: true
+                }
+            }
+        },
+    });
+    return result;
+};
+
 const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) => {
 
     const doctorInfo = await prisma.doctor.findFirstOrThrow({
@@ -193,5 +215,6 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
 export const DoctorService = {
     getAllFromDB,
     getAISuggestions,
+    getDoctorById,
     updateIntoDB
 }

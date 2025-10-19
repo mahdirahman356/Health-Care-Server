@@ -10,6 +10,8 @@ router.get(
 router.post("/suggestion", 
     DoctorController.getAISuggestions);
 
+router.get('/:id', DoctorController.getDoctorById);    
+
 router.patch(
     "/:id",
     DoctorController.updateIntoDB

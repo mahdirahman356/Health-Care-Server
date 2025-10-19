@@ -20,6 +20,11 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
                 error = err.meta,
                 statusCode = httpStatus.BAD_GATEWAY
         }
+        if (err.code === "P2025") {
+            message = "No record was found for a query.",
+                error = err.meta,
+                statusCode = httpStatus.BAD_GATEWAY
+        }
         if (err.code === "P2003") {
             message = "Foreign key constraint failed",
                 error = err.meta,
