@@ -2,7 +2,7 @@ import z from "zod";
 
 const createDoctiorScheduleValidationSchema = z.object({
     body: z.object({
-        scheduleId: z.array(z.string())
+        scheduleIds: z.array(z.string())
     })
 })
 

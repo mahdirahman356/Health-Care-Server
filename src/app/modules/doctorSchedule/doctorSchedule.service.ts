@@ -1,7 +1,7 @@
 import { prisma } from "../../shared/prisma"
 import { IJWTPayload } from "../../types/common"
 
-const insertIntoDB = async (user: IJWTPayload, payload: { scheduleId: string[] }) => {
+const insertIntoDB = async (user: IJWTPayload, payload: { scheduleIds: string[] }) => {
 
     const doctorData = await prisma.doctor.findUniqueOrThrow({
         where: {
@@ -9,7 +9,7 @@ const insertIntoDB = async (user: IJWTPayload, payload: { scheduleId: string[] }
         }
     })
 
-    const doctorScheduleData = payload.scheduleId.map(scheduleId => ({
+    const doctorScheduleData = payload.scheduleIds.map(scheduleId => ({
         doctorId: doctorData.id,
         scheduleId: scheduleId
     }))
