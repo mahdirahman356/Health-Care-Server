@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "appointments" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "payments" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "prescriptions" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
