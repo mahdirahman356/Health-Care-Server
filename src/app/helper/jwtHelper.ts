@@ -10,11 +10,11 @@ const generateToken = (payload: any, secret: Secret, expiresIn: string) => {
         return token
 }
 
-const varifyToken = (token: string, secret: Secret) => {
+const verifyToken = (token: string, secret: Secret) => {
       return jwt.verify(token, secret) as JwtPayload
 }
 
 export const jwtHelper = {
     generateToken,
-    varifyToken
+    verifyToken
 }
