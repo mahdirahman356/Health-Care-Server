@@ -3,9 +3,10 @@ import { prisma } from "../../shared/prisma";
 import bcrypt from "bcryptjs";
 import { fileUploader } from "../../helper/fileUploader";
 import config from "../../../config";
-import { Admin, Doctor, Prisma, UserRole } from "@prisma/client";
+import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
 import { paginationHelper } from "../../helper/paginationHelper";
 import { userSearchableFields } from "./user.constant";
+import { IJWTPayload } from "../../types/common";
 
 const createPatient = async (req: Request) => {
 
@@ -32,6 +33,53 @@ const createPatient = async (req: Request) => {
     return result
 
 }
+
+const getMyProfile = async (user: IJWTPayload) => {
+
+    const userInfo = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: user.email,
+            status: UserStatus.ACTIVE
+        },
+        select: {
+            id: true,
+            email: true,
+            needPasswordChange: true,
+            role: true,
+            status: true
+        }
+    })
+
+    let profileData;
+
+    if (userInfo.role === UserRole.PATIENT) {
+        profileData = await prisma.patient.findUnique({
+            where: {
+                email: userInfo.email
+            }
+        })
+    }
+    else if (userInfo.role === UserRole.DOCTOR) {
+        profileData = await prisma.doctor.findUnique({
+            where: {
+                email: userInfo.email
+            }
+        })
+    }
+    else if (userInfo.role === UserRole.ADMIN) {
+        profileData = await prisma.admin.findUnique({
+            where: {
+                email: userInfo.email
+            }
+        })
+    }
+
+    return {
+        ...userInfo,
+        ...profileData
+    }
+
+};
 
 const createAdmin = async (req: Request): Promise<Admin> => {
 
@@ -96,15 +144,14 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
     return result;
 };
 
-
 const getAllUsers = async (params: any, options: any) => {
 
     const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options)
     const { searchTerm, ...filterData } = params
 
     const andConditions: Prisma.UserWhereInput[] = []
-     
-   if (searchTerm) {
+
+    if (searchTerm) {
         andConditions.push({
             OR: userSearchableFields.map(field => ({
                 [field]: {
@@ -116,29 +163,29 @@ const getAllUsers = async (params: any, options: any) => {
     }
 
 
-     if (Object.keys(filterData).length > 0) {
+    if (Object.keys(filterData).length > 0) {
         andConditions.push({
-             AND: Object.keys(filterData).map(key => ({
-                  [key]: {
+            AND: Object.keys(filterData).map(key => ({
+                [key]: {
                     equals: (filterData as any)[key]
-                  }
-             }))
+                }
+            }))
         })
     }
 
     const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ? {
         AND: andConditions
     } : {}
-    
+
     const result = await prisma.user.findMany({
-        skip,    
+        skip,
         take: limit,
         where: whereConditions,
         orderBy: {
             [sortBy]: sortOrder
         }
     })
-     
+
     const total = await prisma.user.count({
         where: whereConditions
     })
@@ -153,11 +200,28 @@ const getAllUsers = async (params: any, options: any) => {
     }
 };
 
+const changeProfileStatus = async (id: string, payload: { status: UserStatus }) => {
+     const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
 
+    const updateUserStatus = await prisma.user.update({
+        where: {
+            id
+        },
+        data: payload
+    })
+
+    return updateUserStatus;
+};
 
 export const UserService = {
     createPatient,
+    getMyProfile,
     createAdmin,
     createDoctor,
-    getAllUsers
+    getAllUsers,
+    changeProfileStatus
 }

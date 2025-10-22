@@ -14,6 +14,12 @@ router.post("/create-patient",
         return UserController.createPatient(req, res, next)
     })
 
+router.get(
+    '/me',
+    auth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+    UserController.getMyProfile
+)
+
 router.post(
     "/create-admin",
     auth(UserRole.ADMIN),
@@ -34,10 +40,17 @@ router.post(
         return UserController.createDoctor(req, res, next)
     }
 );
+
 router.get(
     "/",
     auth(UserRole.ADMIN),
     UserController.getAllUsers
+);
+
+router.patch(
+    '/:id/status',
+    auth(UserRole.ADMIN),
+    UserController.changeProfileStatus
 );
 
 export const userRoutes = router
