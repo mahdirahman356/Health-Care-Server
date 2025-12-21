@@ -1,7 +1,7 @@
 import { addMinutes, addHours, format } from "date-fns";
 import { prisma } from "../../shared/prisma";
 import { IOptions, paginationHelper } from "../../helper/paginationHelper";
-import { Prisma } from "@prisma/client";
+import { Prisma, Schedule } from "@prisma/client";
 import { IJWTPayload } from "../../types/common";
 
 
@@ -68,7 +68,7 @@ const insertIntoDB = async (payload: any) => {
 
 }
 
-const schedulesForDoctor = async (
+const getAllFromDB = async (
     user: IJWTPayload,
     filters: any,
     options: IOptions
@@ -150,7 +150,17 @@ const schedulesForDoctor = async (
 
 }
 
-const deleteScheduleFromDB = async (id: string) => {
+const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
+    const result = await prisma.schedule.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    return result;
+};
+
+const deleteFromDB = async (id: string) => {
     return await prisma.schedule.delete({
         where: {
             id
@@ -160,6 +170,7 @@ const deleteScheduleFromDB = async (id: string) => {
 
 export const ScheduleService = {
     insertIntoDB,
-    schedulesForDoctor,
-    deleteScheduleFromDB
+    getAllFromDB,
+    getByIdFromDB,
+    deleteFromDB
 }

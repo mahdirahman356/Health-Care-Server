@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
 import { AppointmentService } from "./appointment.service";
 import sendResponse from "../../shared/sendResponse";
-import { IJWTPayload } from "../../types/common";
+import { IAuthUser, IJWTPayload } from "../../types/common";
 import pick from "../../helper/pick";
 import { appointmentFilterableFields } from "./appointment.constant";
 import httpStatus from "http-status";
@@ -44,7 +44,8 @@ const getMyAppointment = catchAsync(async (req: Request & { user?: IJWTPayload }
         statusCode: 200,
         success: true,
         message: "Appointment fetched successfully!",
-        data: result
+        meta: result.meta,
+        data: result.data
     })
 })
 
@@ -63,10 +64,40 @@ const updateAppointmentStatus = catchAsync(async (req: Request & { user?: IJWTPa
     })
 })
 
+const createAppointmentWithPayLater = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const user = req.user;
+
+    const result = await AppointmentService.createAppointmentWithPayLater(user as IAuthUser, req.body);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Appointment booked successfully! You can pay later.",
+        data: result
+    })
+});
+
+const initiatePayment = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const user = req.user;
+    const { id } = req.params;
+
+    const result = await AppointmentService.initiatePaymentForAppointment(id, user as IAuthUser);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Payment session created successfully",
+        data: result
+    })
+});
+
+
 
 export const AppointmentController = {
     createAppointment,
     getAllFromDB,
     getMyAppointment,
-    updateAppointmentStatus
+    updateAppointmentStatus,
+    createAppointmentWithPayLater,
+    initiatePayment,
 }

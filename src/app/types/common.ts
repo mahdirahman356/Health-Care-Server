@@ -4,3 +4,9 @@ export type IJWTPayload = {
     email: string
     role: UserRole
 }
+
+export type IAuthUser = {
+    email: string;
+    role: UserRole
+} | null;
+

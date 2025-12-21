@@ -10,7 +10,7 @@ const router = express.Router()
 router.post("/create-patient",
     fileUploader.upload.single("file"),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = UserValidation.createPatientValidationSchema.parse(JSON.parse(req.body.data))
+        req.body = UserValidation.createPatient.parse(JSON.parse(req.body.data))
         return UserController.createPatient(req, res, next)
     })
 
@@ -25,7 +25,7 @@ router.post(
     auth(UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = UserValidation.createAdminValidationSchema.parse(JSON.parse(req.body.data))
+        req.body = UserValidation.createAdmin.parse(JSON.parse(req.body.data))
         return UserController.createAdmin(req, res, next)
     }
 );
@@ -36,7 +36,7 @@ router.post(
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         console.log(JSON.parse(req.body.data))
-        req.body = UserValidation.createDoctorValidationSchema.parse(JSON.parse(req.body.data))
+        req.body = UserValidation.createDoctor.parse(JSON.parse(req.body.data))
         return UserController.createDoctor(req, res, next)
     }
 );

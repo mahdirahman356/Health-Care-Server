@@ -12,6 +12,12 @@ router.post(
 );
 
 router.get(
+    '/',
+    auth(UserRole.ADMIN),
+    PrescriptionController.getAllFromDB
+);
+
+router.get(
     '/my-prescription',
     auth(UserRole.PATIENT),
     PrescriptionController.patientPrescription

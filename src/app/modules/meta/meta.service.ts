@@ -162,8 +162,6 @@ const getPatientMetaData = async (user: IJWTPayload) => {
     }
 }
 
-
-
 const getBarChartData = async () => {
     const appointmentCountPerMonth = await prisma.$queryRaw`
      SELECT DATE_TRUNC('month', "createdAt") AS month,

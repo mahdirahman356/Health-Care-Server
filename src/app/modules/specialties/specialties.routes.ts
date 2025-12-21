@@ -10,11 +10,13 @@ const router = express.Router();
 
 router.get(
     '/',
+    auth(UserRole.ADMIN),
     SpecialtiesController.getAllFromDB
 );
 
 router.post(
     '/',
+     auth(UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = SpecialtiesValidtaion.create.parse(JSON.parse(req.body.data))
@@ -25,7 +27,7 @@ router.post(
 
 router.delete(
     '/:id',
-    auth(UserRole.ADMIN, UserRole.ADMIN),
+    auth(UserRole.ADMIN),
     SpecialtiesController.deleteFromDB
 );
 
