@@ -9,7 +9,10 @@ import config from "../../../config";
 import { emit } from "process";
 import emailSender from "../../helper/emailSender";
 
-const login = async (payload: { email: string, password: string }) => {
+const login = async (payload: {
+    email: string,
+    password: string
+}) => {
     const userData = await prisma.user.findUniqueOrThrow({
         where: {
             email: payload.email,
@@ -43,82 +46,28 @@ const login = async (payload: { email: string, password: string }) => {
         refreshToken,
         needPasswordChange: userData.needPasswordChange
     };
-}
+};
 
-const getMe = async (user: any) => {
-    const accessToken = user.accessToken;
-    const decodedData = jwtHelper.verifyToken(accessToken, config.jwt.access_secret as Secret);
+const getMe = async (session: any) => {
+    const accessToken = session.accessToken;
+    const decodedData = jwtHelper.verifyToken(accessToken, config.jwt.access_secret  as Secret);
 
     const userData = await prisma.user.findUniqueOrThrow({
         where: {
             email: decodedData.email,
             status: UserStatus.ACTIVE
-        },
-        select: {
-            id: true,
-            email: true,
-            role: true,
-            needPasswordChange: true,
-            status: true,
-            createdAt: true,
-            updatedAt: true,
-            admin: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    profilePhoto: true,
-                    contactNumber: true,
-                    isDeleted: true,
-                    createdAt: true,
-                    updatedAt: true,
-                }
-            },
-            doctor: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    profilePhoto: true,
-                    contactNumber: true,
-                    address: true,
-                    registrationNumber: true,
-                    experience: true,
-                    gender: true,
-                    appointmentFee: true,
-                    qualification: true,
-                    currentWorkingPlace: true,
-                    designation: true,
-                    averageRating: true,
-                    isDeleted: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    doctorSpecialties: {
-                        include: {
-                            specialities: true
-                        }
-                    }
-                }
-            },
-            patient: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    profilePhoto: true,
-                    contactNumber: true,
-                    address: true,
-                    isDeleted: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    patientHealthData: true,
-                }
-            },
-            
         }
-    });
+    })
 
-    return userData;
+    const { id, email, role, needPasswordChange, status } = userData;
+
+    return {
+        id,
+        email,
+        role,
+        needPasswordChange,
+        status
+    }
 
 }
 
@@ -146,19 +95,11 @@ const refreshToken = async (token: string) => {
         config.jwt.access_expires as string
     );
 
-    const refreshToken = jwtHelper.generateToken({
-        email: userData.email,
-        role: userData.role
-    },
-        config.jwt.refresh_secret as Secret,
-        config.jwt.refresh_expires as string
-    );
-
     return {
         accessToken,
-        refreshToken,
         needPasswordChange: userData.needPasswordChange
     };
+
 };
 
 const changePassword = async (user: any, payload: any) => {
@@ -288,7 +229,6 @@ const forgotPassword = async (payload: { email: string }) => {
     )
 };
 
-
 const resetPassword = async (token: string | null, payload: { email?: string, password: string }, user?: { email: string }) => {
     let userEmail: string;
 
@@ -341,6 +281,7 @@ const resetPassword = async (token: string | null, payload: { email?: string, pa
         }
     })
 };
+
 
 export const AuthService = {
     login,

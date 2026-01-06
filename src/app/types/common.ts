@@ -5,8 +5,9 @@ export type IJWTPayload = {
     role: UserRole
 }
 
-export type IAuthUser = {
-    email: string;
-    role: UserRole
-} | null;
-
+export type IPaginationOptions = {
+    page?: number;
+    limit?: number;
+    sortBy?: string | undefined;
+    sortOrder?: string | undefined;
+}

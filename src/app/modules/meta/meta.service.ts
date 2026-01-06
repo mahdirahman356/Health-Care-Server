@@ -41,7 +41,7 @@ const getAdminMetaData = async () => {
     })
 
     const barChartData = await getBarChartData()
-    const pieChartDate = await getPieChartData()
+    const pieChartData = await getPieChartData()
 
     return {
         patientCount,
@@ -51,7 +51,7 @@ const getAdminMetaData = async () => {
         paymentCount,
         totalRevenue,
         barChartData,
-        pieChartDate
+        pieChartData
     }
 
 }
@@ -161,6 +161,8 @@ const getPatientMetaData = async (user: IJWTPayload) => {
         formattedAppointmentStatusDistribution
     }
 }
+
+
 
 const getBarChartData = async () => {
     const appointmentCountPerMonth = await prisma.$queryRaw`

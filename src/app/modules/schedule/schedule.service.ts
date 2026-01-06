@@ -68,7 +68,7 @@ const insertIntoDB = async (payload: any) => {
 
 }
 
-const getAllFromDB = async (
+const schedulesForDoctor = async (
     user: IJWTPayload,
     filters: any,
     options: IOptions
@@ -150,7 +150,7 @@ const getAllFromDB = async (
 
 }
 
-const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
+const getSheduleById = async (id: string): Promise<Schedule | null> => {
     const result = await prisma.schedule.findUnique({
         where: {
             id,
@@ -160,7 +160,7 @@ const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
     return result;
 };
 
-const deleteFromDB = async (id: string) => {
+const deleteScheduleFromDB = async (id: string) => {
     return await prisma.schedule.delete({
         where: {
             id
@@ -170,7 +170,7 @@ const deleteFromDB = async (id: string) => {
 
 export const ScheduleService = {
     insertIntoDB,
-    getAllFromDB,
-    getByIdFromDB,
-    deleteFromDB
+    schedulesForDoctor,
+    getSheduleById,
+    deleteScheduleFromDB
 }

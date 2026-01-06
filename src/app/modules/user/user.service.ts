@@ -3,24 +3,23 @@ import { prisma } from "../../shared/prisma";
 import bcrypt from "bcryptjs";
 import { fileUploader } from "../../helper/fileUploader";
 import config from "../../../config";
-import { Admin, Doctor, Patient, Prisma, UserRole, UserStatus } from "@prisma/client";
+import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
 import { paginationHelper } from "../../helper/paginationHelper";
 import { userSearchableFields } from "./user.constant";
 import { IJWTPayload } from "../../types/common";
 
-const createPatient = async (req: Request): Promise<Patient> => {
-    const file = req.file;
+const createPatient = async (req: Request) => {
 
-    if (file) {
-        const uploadedProfileImage = await fileUploader.uploadToCloudinary(file);
-        req.body.patient.profilePhoto = uploadedProfileImage?.secure_url;
+    if (req.file) {
+        const uploadResult = await fileUploader.uploadToCloudinary(req.file)
+        req.body.patient.profilePhoto = uploadResult?.secure_url
     }
 
-    const hashedPassword: string = await bcrypt.hash(req.body.password, Number(config.bcrypt.salt_round))
+    const hashPassword = await bcrypt.hash(req.body.password, Number(config.bcrypt.salt_round))
 
     const userData = {
         email: req.body.patient.email,
-        password: hashedPassword,
+        password: hashPassword,
         role: UserRole.PATIENT
     }
 
@@ -40,7 +39,8 @@ const createPatient = async (req: Request): Promise<Patient> => {
     });
 
     return result;
-};
+
+}
 
 const getMyProfile = async (user: IJWTPayload) => {
 
@@ -136,7 +136,6 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
         password: hashedPassword,
         role: UserRole.DOCTOR
     }
-    const { specialities, ...doctorData } = req.body.doctor
 
     const result = await prisma.$transaction(async (transactionClient) => {
         await transactionClient.user.create({
@@ -147,54 +146,7 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
             data: req.body.doctor
         });
 
-        if (specialities && Array.isArray(specialities) && specialities.length > 0) {
-            const existingSpecialities = await transactionClient.specialties.findMany({
-                where: {
-                    id: {
-                        in: specialities
-                    }
-                },
-                select: {
-                    id: true
-                }
-            })
-
-            const existingSpecialitiesIds = existingSpecialities.map((s) => s.id)
-            const invalidSpecialities = specialities.filter(
-                (id) => !existingSpecialitiesIds.includes(id)
-            )
-
-            if (invalidSpecialities.length > 0) {
-                throw new Error(
-                    `Invalid specialty Ids ${invalidSpecialities.join(", ")}`
-                )
-            }
-
-            const doctorSpecialitiesData = specialities.map((specialitiesId) => ({
-                doctorId: createdDoctorData.id,
-                specialitiesId: specialitiesId
-            }))
-
-            await transactionClient.doctorSpecialties.createMany({
-                data: doctorSpecialitiesData
-            })
-
-        }
-
-        const doctorWithSpecialities = await transactionClient.doctor.findUnique({
-            where: {
-                id: createdDoctorData.id
-            },
-            include: {
-                doctorSpecialties: {
-                    include: {
-                        specialities: true
-                    }
-                }
-            }
-        })
-
-        return doctorWithSpecialities!;
+        return createdDoctorData;
     });
 
     return result;

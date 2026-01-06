@@ -5,7 +5,6 @@ import { PrescriptionService } from "./prescription.service";
 import sendResponse from "../../shared/sendResponse";
 import pick from "../../helper/pick";
 import httpStatus from 'http-status'
-import { prescriptionFilterableFields } from "./prescription.constants";
 
 const createPrescription = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
     const user = req.user;
@@ -18,19 +17,6 @@ const createPrescription = catchAsync(async (req: Request & { user?: IJWTPayload
         data: result
     })
 })
-
-const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-    const filters = pick(req.query, prescriptionFilterableFields);
-    const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-    const result = await PrescriptionService.getAllFromDB(filters, options);
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: 'Prescriptions retrieval successfully',
-        meta: result.meta,
-        data: result.data,
-    });
-});
 
 const patientPrescription = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
     const user = req.user;
@@ -47,6 +33,5 @@ const patientPrescription = catchAsync(async (req: Request & { user?: IJWTPayloa
 
 export const PrescriptionController = {
     createPrescription,
-    getAllFromDB,
     patientPrescription
 }

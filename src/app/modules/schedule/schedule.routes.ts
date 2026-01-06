@@ -14,20 +14,19 @@ router.post(
 router.get(
     "/",
     auth(UserRole.DOCTOR, UserRole.ADMIN),
-    ScheduleController.getAllFromDB
+    ScheduleController.schedulesForDoctor
 )
 
 router.get(
     '/:id',
     auth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
-    ScheduleController.getByIdFromDB
+    ScheduleController.getSheduleById
 );
-
 
 router.delete(
     "/:id",
     auth(UserRole.ADMIN),
-    ScheduleController.deleteFromDB
+    ScheduleController.deleteScheduleFromDB
 )
 
 export const scheduleRoutes = router;

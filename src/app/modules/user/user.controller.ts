@@ -32,7 +32,7 @@ const getMyProfile = catchAsync(async (req: Request & { user?: IJWTPayload }, re
 });
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
-
+    console.log("In controller", req); 
     const result = await UserService.createAdmin(req);
     sendResponse(res, {
         statusCode: 201,

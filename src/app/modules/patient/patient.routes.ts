@@ -16,11 +16,9 @@ router.get(
 );
 
 router.patch(
-    '/',
-    auth(UserRole.PATIENT),
+    '/:id',
     PatientController.updateIntoDB
 );
-
 
 router.delete(
     '/soft/:id',

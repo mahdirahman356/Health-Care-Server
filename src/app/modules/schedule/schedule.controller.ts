@@ -18,14 +18,14 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-const getAllFromDB = catchAsync(async (req: Request & {user?: IJWTPayload}, res: Response) => {
+const schedulesForDoctor = catchAsync(async (req: Request & {user?: IJWTPayload}, res: Response) => {
 
     const filters = pick(req.query, ["startDateTime", "endDateTime"])
     const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"])
      
     const user = req.user
 
-    const result = await ScheduleService.getAllFromDB(user as IJWTPayload, filters, options);
+    const result = await ScheduleService.schedulesForDoctor(user as IJWTPayload, filters, options);
 
     sendResponse(res, {
         statusCode: 200,
@@ -36,9 +36,9 @@ const getAllFromDB = catchAsync(async (req: Request & {user?: IJWTPayload}, res:
     })
 })
 
-const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+const getSheduleById = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const result = await ScheduleService.getByIdFromDB(id);
+    const result = await ScheduleService.getSheduleById(id);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -47,8 +47,8 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
-    const result = await ScheduleService.deleteFromDB(req.params.id);
+const deleteScheduleFromDB = catchAsync(async (req: Request, res: Response) => {
+    const result = await ScheduleService.deleteScheduleFromDB(req.params.id);
 
     sendResponse(res, {
         statusCode: 200,
@@ -63,7 +63,7 @@ const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
 export const ScheduleController = {
     insertIntoDB,
-    getAllFromDB,
-    getByIdFromDB,
-    deleteFromDB
+    schedulesForDoctor,
+    getSheduleById,
+    deleteScheduleFromDB
 }
